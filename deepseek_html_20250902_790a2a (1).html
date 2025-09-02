@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>狼人杀身份抽取工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 32px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #3498db;
+            margin: 20px 0 15px;
+            font-size: 22px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        
+        .role-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .role-item {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .role-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .role-item label {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .role-item input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #shareLink {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4fc;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 16px;
+            border: 1px dashed #3498db;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .result {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 40px 20px;
+            margin-top: 25px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .good {
+            color: #27ae60;
+            border: 3px solid #27ae60;
+        }
+        
+        .bad {
+            color: #c0392b;
+            border: 3px solid #c0392b;
+        }
+        
+        .neutral {
+            color: #7f8c8d;
+            border: 3px solid #7f8c8d;
+        }
+        
+        .tab {
+            display: flex;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .instructions {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .copy-btn {
+            background: #27ae60;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        .role-icon {
+            margin-right: 10px;
+            font-size: 20px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .config-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .config-summary h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .config-summary ul {
+            columns: 2;
+            list-style-type: none;
+        }
+        
+        .config-summary li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .config-summary .role-icon {
+            width: 25px;
+        }
+        
+        .refresh-btn {
+            background: #e74c3c;
+            margin-top: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            .role-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .config-summary ul {
+                columns: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-moon"></i> 狼人杀身份抽取工具</h1>
+        
+        <div class="tab">
+            <div class="tab-btn active" id="hostTab">主持人 <i class="fas fa-crown"></i></div>
+            <div class="tab-btn" id="playerTab">玩家 <i class="fas fa-user"></i></div>
+        </div>
+
+        <div class="tab-content active" id="hostPanel">
+            <h2>游戏配置</h2>
+            
+            <div class="form-group">
+                <label for="playerCount"><i class="fas fa-users"></i> 游戏人数:</label>
+                <input type="number" id="playerCount" min="6" max="30" value="12">
+            </div>
+            
+            <h2>选择身份及数量</h2>
+            <div class="role-list" id="roleList">
+                <!-- 角色选项将通过JS动态生成 -->
+            </div>
+            
+            <button id="generateBtn"><i class="fas fa-link"></i> 生成游戏链接</button>
+            
+            <div id="shareSection" class="hidden">
+                <h2>分享链接</h2>
+                <p>复制以下链接发送给玩家：</p>
+                <div id="shareLink"></div>
+                <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> 复制链接</button>
+                <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> 刷新游戏</button>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+                <ol>
+                    <li>设置游戏人数和身份数量（身份总数必须等于游戏人数）</li>
+                    <li>点击"生成游戏链接"按钮创建分享链接</li>
+                    <li>复制链接并通过微信发送给玩家</li>
+                    <li>玩家打开链接后，切换到"玩家"选项卡，输入序号抽取身份</li>
+                    <li>每个序号只能抽取一次身份，防止作弊</li>
+                    <li>点击"刷新游戏"可以清除所有抽取记录，开始新游戏</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tab-content" id="playerPanel">
+            <h2>抽取你的身份</h2>
+            
+            <div id="configSummary" class="config-summary">
+                <h3><i class="fas fa-info-circle"></i> 本局游戏配置</h3>
+                <div id="configDetails"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="playerNumber"><i class="fas fa-list-ol"></i> 请输入你的序号 (1-<span id="maxNumber">12</span>):</label>
+                <input type="number" id="playerNumber" min="1" max="12">
+            </div>
+            
+            <button id="drawBtn"><i class="fas fa-dice"></i> 抽取身份</button>
+            
+            <div id="result" class="hidden result"></div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> 玩家须知</h3>
+                <ol>
+                    <li>从主持人处获取你的游戏序号</li>
+                    <li>输入序号并点击"抽取身份"按钮</li>
+                    <li>每个序号只能抽取一次，请谨慎操作</li>
+                    <li>不要向其他玩家透露你的身份</li>
+                    <li>根据主持人指示开始游戏</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 可用角色列表
+        const availableRoles = [
+            { id: 'werewolf', name: '狼人', team: 'bad', icon: '🐺', defaultCount: 4 },
+            { id: 'prophet', name: '预言家', team: 'good', icon: '🔮', defaultCount: 1 },
+            { id: 'witch', name: '女巫', team: 'good', icon: '🧪', defaultCount: 1 },
+            { id: 'hunter', name: '猎人', team: 'good', icon: '🎯', defaultCount: 1 },
+            { id: 'idiot', name: '白痴', team: 'good', icon: '🤪', defaultCount: 1 },
+            { id: 'guard', name: '守卫', team: 'good', icon: '🛡️', defaultCount: 1 },
+            { id: 'mechanicwolf', name: '机械狼', team: 'bad', icon: '🤖', defaultCount: 0 },
+            { id: 'alphawolf', name: '黑狼王', team: 'bad', icon: '👑', defaultCount: 0 },
+            { id: 'whitewolf', name: '白狼王', team: 'bad', icon: '🐺', defaultCount: 0 },
+            { id: 'wolfbeauty', name: '狼美人', team: 'bad', icon: '🌹', defaultCount: 0 },
+            { id: 'knight', name: '骑士', team: 'good', icon: '⚔️', defaultCount: 0 },
+            { id: 'dreamweaver', name: '摄梦人', team: 'good', icon: '💤', defaultCount: 0 },
+            { id: 'bear', name: '熊', team: 'good', icon: '🐻', defaultCount: 0 },
+            { id: 'penguin', name: '企鹅', team: 'good', icon: '🐧', defaultCount: 0 },
+            { id: 'villager', name: '村民', team: 'good', icon: '👨‍🌾', defaultCount: 4 }
+        ];
+
+        // DOM元素
+        const hostTab = document.getElementById('hostTab');
+        const playerTab = document.getElementById('playerTab');
+        const hostPanel = document.getElementById('hostPanel');
+        const playerPanel = document.getElementById('playerPanel');
+        const roleList = document.getElementById('roleList');
+        const playerCountInput = document.getElementById('playerCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const shareSection = document.getElementById('shareSection');
+        const shareLink = document.getElementById('shareLink');
+        const copyBtn = document.getElementById('copyBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const maxNumberSpan = document.getElementById('maxNumber');
+        const playerNumberInput = document.getElementById('playerNumber');
+        const drawBtn = document.getElementById('drawBtn');
+        const resultDiv = document.getElementById('result');
+        const configDetails = document.getElementById('configDetails');
+
+        // 初始化角色选择界面
+        function initRoleSelection() {
+            roleList.innerHTML = '';
+            availableRoles.forEach(role => {
+                const roleItem = document.createElement('div');
+                roleItem.className = 'role-item';
+                roleItem.innerHTML = `
+                    <span class="role-icon">${role.icon}</span>
+                    <label for="${role.id}">${role.name}</label>
+                    <input type="number" id="${role.id}" min="0" value="${role.defaultCount}" data-role="${role.id}">
+                `;
+                roleList.appendChild(roleItem);
+            });
+        }
+
+        // 切换选项卡
+        hostTab.addEventListener('click', () => {
+            hostTab.classList.add('active');
+            playerTab.classList.remove('active');
+            hostPanel.classList.add('active');
+            playerPanel.classList.remove('active');
+        });
+
+        playerTab.addEventListener('click', () => {
+            playerTab.classList.add('active');
+            hostTab.classList.remove('active');
+            playerPanel.classList.add('active');
+            hostPanel.classList.remove('active');
+            
+            // 显示当前游戏配置
+            displayGameConfig();
+        });
+
+        // 更新玩家序号最大值
+        playerCountInput.addEventListener('change', function() {
+            const max = parseInt(this.value);
+            playerNumberInput.setAttribute('max', max);
+            maxNumberSpan.textContent = max;
+        });
+
+        // 生成游戏链接
+        generateBtn.addEventListener('click', function() {
+            const playerCount = parseInt(playerCountInput.value);
+            
+            // 收集角色配置
+            const rolesConfig = {};
+            let totalRoles = 0;
+            
+            availableRoles.forEach(role => {
+                const count = parseInt(document.getElementById(role.id).value) || 0;
+                if (count > 0) {
+                    rolesConfig[role.id] = count;
+                    totalRoles += count;
+                }
+            });
+            
+            // 验证角色总数是否匹配玩家人数
+            if (totalRoles !== playerCount) {
+                alert(`错误：角色总数(${totalRoles})与玩家人数(${playerCount})不匹配！`);
+                return;
+            }
+            
+            // 生成配置编码
+            const configStr = JSON.stringify(rolesConfig);
+            const encodedConfig = btoa(configStr);
+            
+            // 生成分享链接
+            const currentUrl = window.location.href.split('?')[0];
+            const shareUrl = `${currentUrl}?game=${encodedConfig}`;
+            
+            shareLink.textContent = shareUrl;
+            shareSection.classList.remove('hidden');
+            
+            // 保存配置到本地存储，以便玩家页面使用
+            localStorage.setItem('werewolfGameConfig', configStr);
+            localStorage.setItem('werewolfPlayerCount', playerCount);
+            
+            // 清除之前的抽取记录
+            const drawnKey = `werewolfDrawn_${btoa(configStr)}`;
+            localStorage.removeItem(drawnKey);
+        });
+
+        // 复制链接
+        copyBtn.addEventListener('click', function() {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = shareLink.textContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            
+            alert('链接已复制到剪贴板！');
+        });
+
+        // 刷新游戏
+        refreshBtn.addEventListener('click', function() {
+            // 获取当前配置
+            const configStr = localStorage.getItem('werewolfGameConfig');
+            if (configStr) {
+                // 清除抽取记录
+                const drawnKey = `werewolfDrawn_${btoa(configStr)}`;
+                localStorage.removeItem(drawnKey);
+                alert('游戏已刷新，所有抽取记录已清除！');
+            } else {
+                alert('没有找到游戏配置，请先生成游戏链接。');
+            }
+        });
+
+        // 显示游戏配置
+        function displayGameConfig() {
+            // 获取游戏配置
+            let configStr;
+            
+            // 首先尝试从URL参数获取
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameParam = urlParams.get('game');
+            
+            if (gameParam) {
+                configStr = atob(gameParam);
+            } else {
+                // 如果没有URL参数，尝试从本地存储获取
+                configStr = localStorage.getItem('werewolfGameConfig');
+            }
+            
+            if (!configStr) {
+                configDetails.innerHTML = '<p>暂无游戏配置信息</p>';
+                return;
+            }
+            
+            const rolesConfig = JSON.parse(configStr);
+            
+            // 显示配置详情
+            let html = '<ul>';
+            for (const [roleId, count] of Object.entries(rolesConfig)) {
+                if (count > 0) {
+                    const roleInfo = availableRoles.find(r => r.id === roleId);
+                    html += `
+                        <li>
+                            <span class="role-icon">${roleInfo.icon}</span>
+                            ${roleInfo.name}: ${count}人
+                        </li>
+                    `;
+                }
+            }
+            html += '</ul>';
+            
+            // 获取玩家总数
+            let playerCount = localStorage.getItem('werewolfPlayerCount');
+            if (!playerCount) {
+                playerCount = Object.values(rolesConfig).reduce((a, b) => a + b, 0);
+            }
+            
+            html = `<p>总人数: ${playerCount}人</p>` + html;
+            configDetails.innerHTML = html;
+            
+            // 更新玩家序号最大值
+            playerNumberInput.setAttribute('max', playerCount);
+            maxNumberSpan.textContent = playerCount;
+        }
+
+        // 抽取身份
+        drawBtn.addEventListener('click', function() {
+            const playerNumber = parseInt(playerNumberInput.value);
+            const maxPlayers = parseInt(maxNumberSpan.textContent);
+            
+            if (isNaN(playerNumber) || playerNumber < 1 || playerNumber > maxPlayers) {
+                alert(`请输入有效的玩家序号 (1-${maxPlayers})`);
+                return;
+            }
+            
+            // 获取游戏配置
+            let configStr;
+            
+            // 首先尝试从URL参数获取
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameParam = urlParams.get('game');
+            
+            if (gameParam) {
+                configStr = atob(gameParam);
+            } else {
+                // 如果没有URL参数，尝试从本地存储获取
+                configStr = localStorage.getItem('werewolfGameConfig');
+            }
+            
+            if (!configStr) {
+                alert('未找到游戏配置，请通过主持人生成的链接访问');
+                return;
+            }
+            
+            const rolesConfig = JSON.parse(configStr);
+            
+            // 检查该序号是否已经抽取过
+            const drawnKey = `werewolfDrawn_${btoa(configStr)}`;
+            const drawnNumbers = JSON.parse(localStorage.getItem(drawnKey) || '{}');
+            
+            if (drawnNumbers[playerNumber]) {
+                alert('该序号已经抽取过身份，每个序号只能抽取一次！');
+                return;
+            }
+            
+            // 生成角色列表
+            const roles = [];
+            for (const [roleId, count] of Object.entries(rolesConfig)) {
+                const roleInfo = availableRoles.find(r => r.id === roleId);
+                for (let i = 0; i < count; i++) {
+                    roles.push({
+                        id: roleId,
+                        name: roleInfo.name,
+                        team: roleInfo.team,
+                        icon: roleInfo.icon
+                    });
+                }
+            }
+            
+            // 随机分配角色（使用固定种子确保每次相同序号得到相同角色）
+            const seed = `${btoa(configStr)}_${playerNumber}`;
+            const randomIndex = simpleHash(seed) % roles.length;
+            const assignedRole = roles[randomIndex];
+            
+            // 标记该序号为已抽取
+            drawnNumbers[playerNumber] = true;
+            localStorage.setItem(drawnKey, JSON.stringify(drawnNumbers));
+            
+            // 显示结果
+            resultDiv.innerHTML = `
+                <div>你的身份是：</div>
+                <div style="font-size: 42px; margin: 15px 0;">${assignedRole.icon} ${assignedRole.name}</div>
+                <div style="font-size: 18px; margin-top: 10px;">${assignedRole.team === 'good' ? '好人阵营' : '狼人阵营'}</div>
+            `;
+            resultDiv.className = `result ${assignedRole.team}`;
+            resultDiv.classList.remove('hidden');
+        });
+
+        // 简单哈希函数，用于生成固定随机数
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0; // 转换为32位整数
+            }
+            return Math.abs(hash);
+        }
+
+        // 初始化页面
+        initRoleSelection();
+
+        // 检查URL参数，如果是玩家链接自动切换到玩家面板
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('game')) {
+            playerTab.click();
+            
+            // 尝试从配置中获取玩家数量
+            try {
+                const gameParam = urlParams.get('game');
+                const configStr = atob(gameParam);
+                const rolesConfig = JSON.parse(configStr);
+                
+                let playerCount = 0;
+                for (const count of Object.values(rolesConfig)) {
+                    playerCount += count;
+                }
+                
+                playerCountInput.value = playerCount;
+                playerNumberInput.setAttribute('max', playerCount);
+                maxNumberSpan.textContent = playerCount;
+                
+                // 保存配置到本地存储
+                localStorage.setItem('werewolfGameConfig', configStr);
+                localStorage.setItem('werewolfPlayerCount', playerCount);
+            } catch (e) {
+                console.error('解析游戏配置失败', e);
+            }
+        }
+    </script>
+</body>
+</html>
