@@ -1,2 +1,1 @@
-# dpwolf
-deepseek狼人杀
+狼人杀
